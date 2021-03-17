@@ -240,6 +240,8 @@ module pulpissimo #(
 	logic [`N_FPGAIO-1:0]     	s_fpgaio_in;
 	logic [`N_FPGAIO-1:0]      	s_fpgaio_oe;
   
+   logic                                s_efpga_clk;
+                                
   logic                         s_fpga_clk_1_i;
   logic                         s_fpga_clk_2_i;
   logic                         s_fpga_clk_3_i;
@@ -606,6 +608,7 @@ logic [1:0]                  s_selected_pad_mode;
 
         .ref_clk_i                  ( s_ref_clk                   ),
         .slow_clk_o                 ( s_slow_clk                  ),
+        .efpga_clk_o                (s_efpga_clk),
         .bootsel_i                  (s_bootsel                    ),
         .rst_ni                     ( s_rstn                      ),
 
@@ -647,6 +650,36 @@ logic [1:0]                  s_selected_pad_mode;
    //
    // SOC DOMAIN
    //
+
+
+                              assign efpga_fcb_spis_rst_n             = 0;
+                              assign efpga_fcb_spis_mosi              = 0;
+                              assign efpga_fcb_spis_cs_n              = 0;
+                              assign efpga_fcb_spis_clk               = 0;
+                              assign efpga_fcb_spi_mode_en_bo         = 0;
+                              assign s_in_stm= 0;
+                              assign fpga_test_fcb_pif_vldi         = 0;
+                              assign fpga_test_fcb_pif_di_l_0       = 0;
+                              assign fpga_test_fcb_pif_di_l_1       = 0;
+                              assign fpga_test_fcb_pif_di_l_2       = 0;
+                              assign fpga_test_fcb_pif_di_l_3       = 0;
+                              assign fpga_test_fcb_pif_di_h_0       = 0;
+                              assign fpga_test_fcb_pif_di_h_1       = 0;
+                              assign fpga_test_fcb_pif_di_h_2       = 0;
+                              assign fpga_test_fcb_pif_di_h_3       = 0;
+                              assign fpga_test_FB_SPE_IN_0          = 0;
+                              assign fpga_test_FB_SPE_IN_1          = 0;
+                              assign fpga_test_FB_SPE_IN_2          = 0;
+                              assign fpga_test_FB_SPE_IN_3          = 0;
+                              assign fpga_test_M_0                  = 0;
+                              assign fpga_test_M_1                  = 0;
+                              assign fpga_test_M_2                  = 0;
+                              assign fpga_test_M_3                  = 0;
+                              assign fpga_test_M_4                  = 0;
+                              assign fpga_test_M_5                  = 0;
+                              assign fpga_test_MLATCH               = 0;
+
+                              
    soc_domain #(
       .CORE_TYPE          ( CORE_TYPE                  ),
       .USE_FPU            ( USE_FPU                    ),
@@ -699,21 +732,9 @@ logic [1:0]                  s_selected_pad_mode;
         .fpgaio_out_o                 ( s_fpgaio_out                    ),
         .fpgaio_in_i                  ( s_fpgaio_in                     ),
         .fpgaio_oe_o                  ( s_fpgaio_oe                     ),
-		
-        .fpga_clk_1_i                 ( s_fpga_clk_1_i                  ),
-        .fpga_clk_2_i                 ( s_fpga_clk_2_i                  ),
-        .fpga_clk_3_i                 ( s_fpga_clk_3_i                  ),
-        .fpga_clk_4_i                 ( s_fpga_clk_4_i                  ),
-        .fpga_clk_5_i                 ( s_fpga_clk_5_i                  ),
 
-        // .uart_tx_o                    ( s_uart_tx                       ),
-        // .uart_rx_i                    ( s_uart_rx                       ),
-
-        // .cam_clk_i                    ( s_cam_pclk                       ),
-        // .cam_data_i                   ( s_cam_data                       ),
-        // .cam_hsync_i                  ( s_cam_hsync                      ),
-        // .cam_vsync_i                  ( s_cam_vsync                      ),
-
+        .fpga_clk_in ({s_fpgaio_in[5:2],
+                      s_slow_clk, s_efpga_clk}),
         .timer_ch0_o                  ( s_timer0                         ),
         .timer_ch1_o                  ( s_timer1                         ),
         .timer_ch2_o                  ( s_timer2                         ),

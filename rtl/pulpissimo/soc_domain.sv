@@ -77,11 +77,8 @@ module soc_domain #(
 	input  logic [`N_FPGAIO-1:0]   	fpgaio_in_i           ,
 	output logic [`N_FPGAIO-1:0]   	fpgaio_oe_o           ,
 
-    input  logic                             fpga_clk_1_i,
-    input  logic                             fpga_clk_2_i,
-    input  logic                             fpga_clk_3_i,
-    input  logic                             fpga_clk_4_i,
-    input  logic                             fpga_clk_5_i,
+    input logic [5:0]                          fpga_clk_in,
+
 	
 	output logic [3:0]						timer_ch0_o,
 	output logic [3:0]						timer_ch1_o,
@@ -290,7 +287,7 @@ module soc_domain #(
 		.ref_clk_i                   (ref_clk_i),
 		.slow_clk_i                  (slow_clk_i),
         .test_clk_i                  (test_clk_i),
-		
+	.fpga_clk_in 		     (fpga_clk_in),	
         .rstn_glob_i                 (rstn_glob_i),
 		
 		.mode_select_i               (mode_select_i),

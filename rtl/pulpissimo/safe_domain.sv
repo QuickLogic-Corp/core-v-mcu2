@@ -17,6 +17,7 @@ module safe_domain #(
 ) (
         input  logic             ref_clk_i            ,
         output logic             slow_clk_o           ,
+        output logic                               efpga_clk_o,
         input  logic             bootsel_i            ,
         input  logic             rst_ni               ,
         output logic             rst_no               ,
@@ -118,7 +119,6 @@ module safe_domain #(
         .init_no     (             )  //not used
     );
 
-  assign slow_clk_o = ref_clk_i;
 
 `else
   assign s_rstn_sync = s_rstn;
@@ -135,7 +135,7 @@ module safe_domain #(
     (
      .rst_ni(s_rstn_sync),
      .ref_clk_i(ref_clk_i),
-     .mhz4 (),
+     .mhz4 (efpga_clk_o),
      .slow_clk_o(slow_clk_o)
      );
 `endif
