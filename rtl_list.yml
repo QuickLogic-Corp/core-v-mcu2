@@ -17,5 +17,6 @@ quicklogic:
 ql_fcb:
   path: ql_fcb
 ql_math_unit:
+  commit: Acc+4
   path: ql_math_unit
 
