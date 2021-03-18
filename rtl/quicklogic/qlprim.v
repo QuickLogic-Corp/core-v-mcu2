@@ -2078,10 +2078,16 @@ endspecify
 
 endmodule
 
-primitive udpmux3(Z, A, B, C, D, E, S, T);
+//primitive udpmux3(Z, A, B, C, D, E, S, T);
+module udpmux3(Z, A, B, C, D, E, S, T);
    output Z;
    input A, B, C, D, E, S, T;
-   table
+   assign Z = (A & ~S & ~T) |
+              (B & ~S & T) |
+              (C & S & T);
+   endmodule
+/*
+    table
    // A  B  C  D  E     S  T   :    Z
       1  ?  ?  ?  ?     0  0   :    1  ;
       0  ?  ?  ?  ?     0  0   :    0  ;
@@ -2093,7 +2099,7 @@ primitive udpmux3(Z, A, B, C, D, E, S, T);
       ?  ?  ?  1  ?     1  1   :    1  ;
    endtable
 endprimitive // udpmux3
-
+*/
 // P_MUX2 cell -----------------------------------------------------------------
 
 
@@ -2125,12 +2131,23 @@ specify
    (A => Z) = 0;
 endspecify
 
-endmodule
+endmodule // P_BUF
 
-primitive udpmux2(Z, A, B, C, D, S);
+
+//primitive udpmux2(Z, A, B, C, D, S);
+module updmux2 (Z, A, B, C, D, S);
+   
+
    output Z;
    input A, B, C, D, S;
-   table
+
+   assign Z = (A & ~B & ~S) |
+              (C & ~D & S) |
+              ( A & ~B & C & ~D);
+endmodule // updmux2
+
+   
+/*   table
       // A  B  C  D  S   :    Z
          1  0  ?  ?  0   :    1  ;
          0  ?  ?  ?  0   :    0  ;
@@ -2146,11 +2163,17 @@ primitive udpmux2(Z, A, B, C, D, S);
          ?  1  0  ?  ?   :    0  ; // new
    endtable
 endprimitive // udpmux2
+*/
 
-primitive udpand6(Z, A, B, C, D, E, F);
+
+//primitive udpand6(Z, A, B, C, D, E, F);
+module udpand6 (Z, A, B, C, D, E, F);
    output Z;
    input A, B, C, D, E, F;
-   table
+   assign z = (A & ~B & C & ~D & E & ~F);
+endmodule // udpand6
+
+/*   table
       // A  B  C  D  E  F  :  Z
          1  0  1  0  1  0  :  1  ;
          0  ?  ?  ?  ?  ?  :  0  ;
@@ -2161,7 +2184,7 @@ primitive udpand6(Z, A, B, C, D, E, F);
          ?  ?  ?  ?  ?  1  :  0  ;
    endtable
 endprimitive // udpand6
-
+*/
 module P_AND6( A, B, C, D, E, F, Z );
 input A, B, C, D, E, F;
 output Z;
@@ -2202,7 +2225,7 @@ endspecify
 endmodule
 
 `timescale 1ns/10ps
-module OBUF( IN_OBUF, OUT_OBUF);
+module qlOBUF( IN_OBUF, OUT_OBUF);
 input IN_OBUF;
 output OUT_OBUF;
 
@@ -2229,7 +2252,7 @@ endmodule
 
 
 `timescale 1ns/10ps
-module IBUF(IN_IBUF, OUT_IBUF);
+module qlIBUF(IN_IBUF, OUT_IBUF);
 input IN_IBUF;
 output OUT_IBUF;
 
