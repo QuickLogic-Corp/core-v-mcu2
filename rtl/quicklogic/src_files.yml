@@ -5,6 +5,6 @@ quicklogic:
     top1vq.sv,
     Arnold2_design.sv,
     qlprim.v,
-    primative_macros.v
+    primitive_macros.v
   ]
 
