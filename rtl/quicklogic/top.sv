@@ -332,7 +332,7 @@ module top1
 	      if (lint_REQ & !lint_GNT) begin
                  if (lint_WEN == 0) begin
                     lint_GNT <= 1;
-                   apb_fsm <= WRITE;
+                    apb_fsm <= WRITE;
                  end
                  else begin
 		    apb_fsm <= READ;
@@ -368,6 +368,7 @@ module top1
  */
 	   WRITE: begin
 	      lint_VALID <= lint_GNT;
+              lint_GNT <= 0;
 	      apb_fsm <= IDLE;
 	      
 	      casex (lint_ADDR)
@@ -480,7 +481,7 @@ module top1
 		20'h60: lint_RDATA <= fpgaio_in[31:0];
 		20'h64: lint_RDATA <= fpgaio_in[63:32];
 		20'h68: lint_RDATA <= {saved_REQ,
-cnt5,cnt4,cnt3,cnt2,cnt1,fpgaio_in[79:64]};
+                                       cnt5,cnt4,cnt3,cnt2,cnt1,fpgaio_in[79:64]};
 		20'h6C: lint_RDATA <= {16'b0,i_events};
 
 		20'h80: lint_RDATA <= tcdm_result_p0;
