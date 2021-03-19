@@ -1,6 +1,10 @@
 quicklogic:
   files: [
     eFPGA_wrapper.sv,
-    top.sv
+    top.sv,
+    top1vq.sv,
+    Arnold2_design.sv,
+    qlprim.v,
+    primative_macros.v
   ]
 

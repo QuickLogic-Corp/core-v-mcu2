@@ -329,10 +329,11 @@ module top1
 //	      PREADY <= 0;
 //	      PSLVERR <= 0;
                             
-	      if (lint_REQ) begin
-                 lint_GNT <= 0;
-                 if (lint_WEN == 0)
+	      if (lint_REQ & !lint_GNT) begin
+                 if (lint_WEN == 0) begin
+                    lint_GNT <= 1;
                    apb_fsm <= WRITE;
+                 end
                  else begin
 		    apb_fsm <= READ;
 		    case (lint_ADDR[19:12])
@@ -492,7 +493,7 @@ cnt5,cnt4,cnt3,cnt2,cnt1,fpgaio_in[79:64]};
 		20'h104: lint_RDATA <= m0_m1_dataout;
 		20'h108: lint_RDATA <= m1_m0_dataout;
 		20'h10C: lint_RDATA <= m1_m1_dataout;
-		20'h1000: lint_RDATA <= 32'hca11ef3a;
+		20'h800: lint_RDATA <= 32'hca11ef3a;
                 
 		
 		20'b0000_0001_xxxx_xxxx_xxxx, 20'b0000_0010_xxxx_xxxx_xxxx, 20'b0000_0011_xxxx_xxxx_xxxx,
@@ -517,7 +518,7 @@ cnt5,cnt4,cnt3,cnt2,cnt1,fpgaio_in[79:64]};
 		  lint_RDATA <= m1_oper1_rdata;
 		20'b0000_0110_xxxx_xxxx_xxxx:
 		  lint_RDATA <= m1_coef_rdata;
-		default: lint_RDATA <= '0;
+		default: lint_RDATA <= lint_RDATA;
 	      endcase // casex (lint_ADDR)
 	   end // case: READ_WAIT
            default: apb_fsm <= IDLE;
