@@ -1,5 +1,5 @@
 `include "pulp_soc_defines.sv"
-module eFPGA_wrapper
+module eFPGA_wrapper1
 (
  output logic [3:0]           test_fb_spe_out,
  input [3:0]                  test_fb_spe_in,

@@ -1,6 +1,6 @@
-/Version : AU 1.3.0.PreRelease Oct 15 2020
+//Version : AU 1.3.0.PreRelease Oct 15 2020
 
-module myDesign_QL_eFPGA_ArcticPro2_32X32_GF_22_Arnold2 
+module A2_design 
   (
    input [5:0] 	       CLK,
    input [3:0] 	       RESET,
@@ -233,7 +233,7 @@ module myDesign_QL_eFPGA_ArcticPro2_32X32_GF_22_Arnold2
 		       );
 
 
-QL_eFPGA_ArcticPro2_32X32_GF_22_Arnold2 myDeviceInstance_QL_eFPGA_ArcticPro2_32X32_GF_22_Arnold2 (
+QL_eFPGA_ArcticPro2_32X32_GF_22 A2 (
 .A2F_CLK0(CLK[0]]),
 .A2F_CLK1(CLK[1]),
 .A2F_CLK2(CLK[2]),
