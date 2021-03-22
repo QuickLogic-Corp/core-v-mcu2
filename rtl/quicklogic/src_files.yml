@@ -3,9 +3,9 @@ quicklogic:
     eFPGA_wrapper.sv,
     top.sv,
     top1vq.sv,
-    top1_wrapper.v    
+    top1_wrapper.v,   
     Arnold2_design.sv,
     qlprim.v,
-    primitive_macros.v
+    primitive_macros.v,
   ]
 
