@@ -3,21 +3,24 @@
 // `include "pulp_soc_defines.sv"
 module top1 
   (
-   input [5:0]         CLK,
-   input [3:0]         RESET,
-   input               lint_REQ, lint_WEN,
+   input [5:0] 	       CLK,
+   input [3:0] 	       RESET,
+   input 	       lint_REQ, lint_WEN,
    
    input [19:0]        lint_ADDR, //PADDR,
    input [31:0]        lint_WDATA, //PWDATA,
-   input [3:0]         lint_BE,
+   input [3:0] 	       lint_BE,
    output logic        lint_VALID, lint_GNT, //PREADY, PSLVERR,
    output logic [31:0] lint_RDATA, //PRDATA,
    
-   output              APB_CLK,
+   output 	       lint_clk,
    
    output [79:0]       fpgaio_out, fpgaio_oe,
    input [79:0]        fpgaio_in,
    output [15:0]       events_o,
+   input [31:0]        control_in,
+   output [31:0]       status_out,
+   output [7:0]        version,
    
    input [31:0]        m0_oper0_rdata, m0_oper1_rdata, m0_coef_rdata, 
    output [1:0]        m0_oper0_rmode, m0_oper0_wmode, m0_oper1_rmode, m0_oper1_wmode,
@@ -28,17 +31,17 @@ module top1
    output logic [31:0] m0_oper0_wdata, m0_oper1_wdata, m0_coef_wdata,
    output [1:0]        m0_coef_rmode, m0_coef_wmode,
    output logic        m0_coef_wdsel, m0_coef_we, m0_coef_rclk, m0_coef_wclk,
-   output              m0_oper0_powerdn,m0_oper1_powerdn,m0_coef_powerdn,
+   output 	       m0_oper0_powerdn,m0_oper1_powerdn,m0_coef_powerdn,
 	     
    output [31:0]       m0_m0_oper_in, m0_m0_coef_in, m0_m1_oper_in, m0_m1_coef_in,
    input [31:0]        m0_m0_dataout, m0_m1_dataout,
    output [5:0]        m0_m0_outsel, m0_m1_outsel,
-   output              m0_m0_tc, m0_m1_tc,
+   output 	       m0_m0_tc, m0_m1_tc,
    output logic        m0_m0_clk, m0_m1_clk, m0_m0_clken, m0_m1_clken,
-   output              m0_m0_osel, m0_m0_csel, m0_m1_osel, m0_m1_csel,
+   output 	       m0_m0_osel, m0_m0_csel, m0_m1_osel, m0_m1_csel,
    output [1:0]        m0_m0_mode, m0_m1_mode,
-   output              m0_m0_sat, m0_m0_clr, m0_m0_rnd, m0_m1_sat, m0_m1_clr, m0_m1_rnd,
-   output              m0_m0_reset, m0_m1_reset,
+   output 	       m0_m0_sat, m0_m0_clr, m0_m0_rnd, m0_m1_sat, m0_m1_clr, m0_m1_rnd,
+   output 	       m0_m0_reset, m0_m1_reset,
 
    input [31:0]        m1_oper0_rdata, m1_oper1_rdata, m1_coef_rdata, 
    output [1:0]        m1_oper0_rmode, m1_oper0_wmode, m1_oper1_rmode, m1_oper1_wmode,
@@ -49,27 +52,27 @@ module top1
    output logic [31:0] m1_oper0_wdata, m1_oper1_wdata, m1_coef_wdata,
    output [1:0]        m1_coef_rmode, m1_coef_wmode,
    output logic        m1_coef_wdsel, m1_coef_we, m1_coef_rclk, m1_coef_wclk,
-   output              m1_oper0_powerdn, m1_oper1_powerdn, m1_coef_powerdn,
+   output 	       m1_oper0_powerdn, m1_oper1_powerdn, m1_coef_powerdn,
 	     
    output [31:0]       m1_m0_oper_in, m1_m0_coef_in, m1_m1_oper_in, m1_m1_coef_in,
    input [31:0]        m1_m0_dataout, m1_m1_dataout,
    output [5:0]        m1_m0_outsel, m1_m1_outsel,
-   output              m1_m0_tc, m1_m1_tc,
+   output 	       m1_m0_tc, m1_m1_tc,
    output logic        m1_m0_clk, m1_m1_clk, m1_m0_clken, m1_m1_clken,
-   output              m1_m0_osel, m1_m0_csel, m1_m1_osel, m1_m1_csel,
+   output 	       m1_m0_osel, m1_m0_csel, m1_m1_osel, m1_m1_csel,
    output [1:0]        m1_m0_mode, m1_m1_mode,
-   output              m1_m0_sat, m1_m0_clr, m1_m0_rnd, m1_m1_sat, m1_m1_clr, m1_m1_rnd,
-   output              m1_m0_reset, m1_m1_reset,
+   output 	       m1_m0_sat, m1_m0_clr, m1_m0_rnd, m1_m1_sat, m1_m1_clr, m1_m1_rnd,
+   output 	       m1_m0_reset, m1_m1_reset,
 
    output logic [19:0] tcdm_addr_p0,tcdm_addr_p1,tcdm_addr_p2,tcdm_addr_p3,
    input [31:0]        tcdm_rdata_p0, tcdm_rdata_p1, tcdm_rdata_p2, tcdm_rdata_p3,
-   input               tcdm_valid_p0, tcdm_valid_p1, tcdm_valid_p2, tcdm_valid_p3,
-   input               tcdm_gnt_p0, tcdm_gnt_p1, tcdm_gnt_p2, tcdm_gnt_p3, 
+   input 	       tcdm_valid_p0, tcdm_valid_p1, tcdm_valid_p2, tcdm_valid_p3,
+   input 	       tcdm_gnt_p0, tcdm_gnt_p1, tcdm_gnt_p2, tcdm_gnt_p3, 
    output logic [31:0] tcdm_wdata_p0, tcdm_wdata_p1, tcdm_wdata_p2, tcdm_wdata_p3,
    output logic [3:0]  tcdm_be_p0, tcdm_be_p1, tcdm_be_p2, tcdm_be_p3,
-   output logic        tcdm_we_p0, tcdm_we_p1, tcdm_we_p2, tcdm_we_p3,
+   output logic        tcdm_wen_p0, tcdm_wen_p1, tcdm_wen_p2, tcdm_wen_p3,
    output logic        tcdm_req_p0, tcdm_req_p1, tcdm_req_p2, tcdm_req_p3,
-   output              tcdm_clk_p0, tcdm_clk_p1, tcdm_clk_p2, tcdm_clk_p3
+   output 	       tcdm_clk_p0, tcdm_clk_p1, tcdm_clk_p2, tcdm_clk_p3
 	     );
 
    logic [3:0]			apb_fsm;
@@ -86,7 +89,11 @@ module top1
    parameter IDLE = 0, ENABLE = 1, READ = 2, WRITE = 3;
    parameter READ_WAIT = 4, READ_DONE = 5;
 
-
+   assign version = 8'h55; // defpins for versin register in soc_cntrl
+   assign status_out = ~control_in; // Loop around logic for test
+   
+   
+     
    assign m0_oper0_powerdn = 0;
    assign m0_oper1_powerdn = 0;
    assign m0_coef_powerdn = 0;
@@ -95,7 +102,7 @@ module top1
    assign m1_coef_powerdn = 0;
 
 
-   assign APB_CLK = CLK[0];
+   assign lint_clk = CLK[0];
 
    assign m0_oper0_rclk = CLK[0];
    assign m0_oper1_rclk = CLK[0];
@@ -374,22 +381,22 @@ module top1
 	      casex (lint_ADDR)
 		20'h0: begin 
 		   tcdm_addr_p0 <= lint_WDATA[19:0];
-		   tcdm_we_p0 <= lint_WDATA[31];
+		   tcdm_wen_p0 <= lint_WDATA[31];
 		   tcdm_be_p0 <= lint_BE;
 		end
 		20'h4: begin 
 		   tcdm_addr_p1 <= lint_WDATA[19:0];
-		   tcdm_we_p1 <= lint_WDATA[31];
+		   tcdm_wen_p1 <= lint_WDATA[31];
 		   tcdm_be_p1 <= lint_BE;
 		end
 		20'h8: begin
 		   tcdm_addr_p2 <= lint_WDATA[19:0];
-		   tcdm_we_p2 <= lint_WDATA[31];
+		   tcdm_wen_p2 <= lint_WDATA[31];
 		   tcdm_be_p2 <= lint_BE;		 
 		end
 		20'hc: begin 
 		   tcdm_addr_p3 <= lint_WDATA[19:0];
-		   tcdm_we_p3 <= lint_WDATA[31];
+		   tcdm_wen_p3 <= lint_WDATA[31];
 		   tcdm_be_p3 <= lint_BE;
 		end
 		20'h80: tcdm_wdata_p0 <= lint_WDATA;
