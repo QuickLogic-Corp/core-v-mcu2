@@ -6,6 +6,7 @@ __pycache__/
 ipstools/
 *.bak
 rtl/modules-gf22fdx
+rtl/modules-gf22fdx/
 rtl/ql_fcb/src_files.yml
 fpga/core-v-mcu2.bit/
 rtl/ql_fcb/README.md
