@@ -147,14 +147,14 @@ module eFPGA_wrapper1
    assign fpgaio_oe = fpga_oe[`N_FPGAIO-1:0];
    assign fpgaio_out = fpga_out[`N_FPGAIO-1:0];
    
-   top1 Arnold2_Design (
+   A2_design top1 (// Arnold2_Design (
 // ouputs to FCB
 
  // SOC signals
 .fpgaio_oe(fpga_oe), // ouput
 .fpgaio_out(fpga_out), // ouput
 .fpgaio_in(fpgo_in),   // input
-.events_o(events_o),  // output
+.event_o(events_o),  // output
                                  
 //.PRDATA(),//apb_fpga_prdata),
 //.PREADY(),//apb_fpga_ready_o),
@@ -181,7 +181,7 @@ module eFPGA_wrapper1
 .tcdm_clk_p1(tcdm_clk_p1),
 .tcdm_clk_p2(tcdm_clk_p2),
 .tcdm_clk_p3(tcdm_clk_p3),
-.APB_CLK(apb_fpga_clk_o),
+.lint_CLK(apb_fpga_clk_o),
 
 .tcdm_be_p3(tcdm_be_p3),
 .tcdm_be_p2(tcdm_be_p2),
