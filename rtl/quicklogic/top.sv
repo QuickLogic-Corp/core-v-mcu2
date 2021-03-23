@@ -179,15 +179,15 @@ module top1
    assign m1_m1_sat = m1_m1_control[18];
    assign m1_m1_reset = m1_m1_control[31];
    
-   assign m1_oper0_rmode = m0_ram_control[1:0];
-   assign m1_oper0_wmode = m0_ram_control[3:2];
-   assign m1_oper1_rmode = m0_ram_control[5:4];
-   assign m1_oper1_wmode = m0_ram_control[7:6];
-   assign m1_coef_rmode = m0_ram_control[9:8];
-   assign m1_coef_wmode = m0_ram_control[11:10];
-   assign m1_oper0_wdsel = m0_ram_control[12];
-   assign m1_oper1_wdsel = m0_ram_control[13];
-   assign m1_coef_wdsel = m0_ram_control[14];
+   assign m1_oper0_rmode = m1_ram_control[1:0];
+   assign m1_oper0_wmode = m1_ram_control[3:2];
+   assign m1_oper1_rmode = m1_ram_control[5:4];
+   assign m1_oper1_wmode = m1_ram_control[7:6];
+   assign m1_coef_rmode = m1_ram_control[9:8];
+   assign m1_coef_wmode = m1_ram_control[11:10];
+   assign m1_oper0_wdsel = m1_ram_control[12];
+   assign m1_oper1_wdsel = m1_ram_control[13];
+   assign m1_coef_wdsel = m1_ram_control[14];
 
 
 
@@ -356,23 +356,6 @@ module top1
            end // case: IDLE
            
 
-/*
-	   ENABLE: begin
-	      if (PWRITE)
-		apb_fsm <= WRITE;
-	      else begin
-		 apb_fsm <= READ;
-		 case (PADDR[19:12])
-		   8'h01: m0_oper0_raddr <= PADDR[11:0];
-		   8'h02: m0_oper1_raddr <= PADDR[11:0];
-		   8'h03: m0_coef_raddr <= PADDR[11:0];
-		   8'h04: m1_oper0_raddr <= PADDR[11:0];
-		   8'h05: m1_oper1_raddr <= PADDR[11:0];
-		   8'h06: m1_coef_raddr <= PADDR[11:0];
-		 endcase // case PADDR[19
-	      end // else: !if(PWRITE)
-	   end
- */
 	   WRITE: begin
 	      lint_VALID <= lint_GNT;
               lint_GNT <= 0;
@@ -382,31 +365,64 @@ module top1
 		20'h0: begin 
 		   tcdm_addr_p0 <= lint_WDATA[19:0];
 		   tcdm_wen_p0 <= lint_WDATA[31];
-		   tcdm_be_p0 <= lint_BE;
+		   tcdm_be_p0 <= lint_WDATA[23:20];
 		end
 		20'h4: begin 
 		   tcdm_addr_p1 <= lint_WDATA[19:0];
 		   tcdm_wen_p1 <= lint_WDATA[31];
-		   tcdm_be_p1 <= lint_BE;
+		   tcdm_be_p1 <= lint_WDATA[23:20];
 		end
 		20'h8: begin
 		   tcdm_addr_p2 <= lint_WDATA[19:0];
 		   tcdm_wen_p2 <= lint_WDATA[31];
-		   tcdm_be_p2 <= lint_BE;		 
+		   tcdm_be_p2 <= lint_WDATA[23:20];
 		end
 		20'hc: begin 
 		   tcdm_addr_p3 <= lint_WDATA[19:0];
 		   tcdm_wen_p3 <= lint_WDATA[31];
-		   tcdm_be_p3 <= lint_BE;
+		   tcdm_be_p3 <= lint_WDATA[23:20];
 		end
-		20'h80: tcdm_wdata_p0 <= lint_WDATA;
-		20'h84: tcdm_wdata_p1 <= lint_WDATA;
-		20'h88: tcdm_wdata_p2 <= lint_WDATA;
-		20'h8c: tcdm_wdata_p3 <= lint_WDATA;
-		20'h10: m0_m0_control <= lint_WDATA;
-		20'h14: m0_m1_control <= lint_WDATA;
-		20'h18: m1_m0_control <= lint_WDATA;
-		20'h1c: m1_m1_control <= lint_WDATA;
+		20'h80: begin
+		   tcdm_wdata_p0 <= lint_WDATA;
+		   tcdm_req_p0 <= 1;
+		end
+		20'h84: begin
+		   tcdm_wdata_p1 <= lint_WDATA;
+		   tcdm_req_p1 <= 1;
+		end
+
+		20'h88: begin
+		   tcdm_wdata_p2 <= lint_WDATA;
+		   tcdm_req_p2 <= 1;
+		end
+		20'h8c: begin
+		   tcdm_wdata_p3 <= lint_WDATA;
+		   tcdm_req_p3 <= 1;
+		end
+		20'h10: begin 
+		   if (lint_BE[3]) m0_m0_control[31:24] <=  lint_WDATA[31:24];
+		   if (lint_BE[2]) m0_m0_control[23:16] <=  lint_WDATA[23:16];
+		   if (lint_BE[1]) m0_m0_control[15:8] <=  lint_WDATA[15:8];
+		   if (lint_BE[0]) m0_m0_control[7:0] <=  lint_WDATA[7:0];
+		end
+		20'h14: begin 
+		   if (lint_BE[3]) m0_m1_control[31:24] <=  lint_WDATA[31:24];
+		   if (lint_BE[2]) m0_m1_control[23:16] <=  lint_WDATA[23:16];
+		   if (lint_BE[1]) m0_m1_control[15:8] <=  lint_WDATA[15:8];
+		   if (lint_BE[0]) m0_m1_control[7:0] <=  lint_WDATA[7:0];
+		end
+		20'h18: begin 
+		   if (lint_BE[3]) m1_m0_control[31:24] <=  lint_WDATA[31:24];
+		   if (lint_BE[2]) m1_m0_control[23:16] <=  lint_WDATA[23:16];
+		   if (lint_BE[1]) m1_m0_control[15:8] <=  lint_WDATA[15:8];
+		   if (lint_BE[0]) m1_m0_control[7:0] <=  lint_WDATA[7:0];
+		end
+		20'h1c: begin 
+		   if (lint_BE[3]) m1_m1_control[31:24] <=  lint_WDATA[31:24];
+		   if (lint_BE[2]) m1_m1_control[23:16] <=  lint_WDATA[23:16];
+		   if (lint_BE[1]) m1_m1_control[15:8] <=  lint_WDATA[15:8];
+		   if (lint_BE[0]) m1_m1_control[7:0] <=  lint_WDATA[7:0];
+		end
 		20'h20: m0_ram_control <= lint_WDATA;
 		20'h24: m1_ram_control <= lint_WDATA;
 		20'h30: m0_m0_clken <= 1;
@@ -421,11 +437,6 @@ module top1
 		20'h58: ifpga_oe[79:64] <= lint_WDATA[15:0];
 		20'h6c: i_events <= lint_WDATA[15:0];
 
-		20'h90: tcdm_req_p0 <= 1;
-		20'h94: tcdm_req_p1 <= 1;
-		20'h98: tcdm_req_p2 <= 1;
-		20'h9c: tcdm_req_p3 <= 1;
-//		20'h100: PSLVERR <= 1;
 		
  		20'b0000_0001_xxxx_xxxx_xxxx:  begin // m0_oper0_ram
 		   m0_oper0_waddr <= lint_ADDR[11:0];
@@ -467,11 +478,11 @@ module top1
 	   READ: begin
 	      apb_fsm <= READ_WAIT;
 	      casex (lint_ADDR)
-		20'h0: lint_RDATA <= tcdm_rdata_p0;
-		20'h4: lint_RDATA <= tcdm_rdata_p1;
-		20'h8: lint_RDATA <= tcdm_rdata_p2;
-		20'hc: lint_RDATA <= tcdm_rdata_p3;
-		
+		20'h04: lint_RDATA <= {tcdm_wen_p0,7'b0,tcdm_be_p0,tcdm_addr_p0};
+		20'h08: lint_RDATA <= {tcdm_wen_p1,7'b0,tcdm_be_p1,tcdm_addr_p1};
+		20'h08: lint_RDATA <= {tcdm_wen_p2,7'b0,tcdm_be_p3,tcdm_addr_p2};
+		20'h0C: lint_RDATA <= {tcdm_wen_p3,7'b0,tcdm_be_p3,tcdm_addr_p3};
+
 		20'h10: lint_RDATA <= m0_m0_control;
 		20'h14: lint_RDATA <= m0_m1_control;
 		20'h18: lint_RDATA <= m1_m0_control;
@@ -492,9 +503,9 @@ module top1
 		20'h6C: lint_RDATA <= {16'b0,i_events};
 
 		20'h80: lint_RDATA <= tcdm_result_p0;
-				20'h84: lint_RDATA <= tcdm_result_p1;
-				20'h88: lint_RDATA <= tcdm_result_p2;
-				20'h8C: lint_RDATA <= tcdm_result_p3;
+		20'h84: lint_RDATA <= tcdm_result_p1;
+		20'h88: lint_RDATA <= tcdm_result_p2;
+		20'h8C: lint_RDATA <= tcdm_result_p3;
 		
 		
 		20'h100: lint_RDATA <= m0_m0_dataout;
