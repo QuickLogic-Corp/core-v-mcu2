@@ -160,7 +160,7 @@ module eFPGA_wrapper1
 .fpgaio_oe(fpga_oe), // ouput
 .fpgaio_out(fpga_out), // ouput
 .fpgaio_in(fpgo_in),   // input
-.event_o(events_o),  // output
+.events_o(events_o),  // output
                                  
 //.PRDATA(),//apb_fpga_prdata),
 //.PREADY(),//apb_fpga_ready_o),
