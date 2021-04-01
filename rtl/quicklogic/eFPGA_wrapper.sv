@@ -130,7 +130,8 @@ module eFPGA_wrapper1
    wire [1:0]                 m0_coef_rmode, m0_coef_wmode;
    wire [31:0]                m0_coef_rdata, m0_coef_wdata;
    wire [11:0]                m0_coef_raddr,m0_coef_waddr;
-
+   wire                       m0_oper0_powerdn,m0_oper1_powerdn,m0_coef_powerdn;
+   
    wire                       m1_oper0_rclk, m1_oper0_wclk, m1_oper0_we, m1_oper0_wdsel;
    wire [1:0]                 m1_oper0_rmode, m1_oper0_wmode;
    wire [31:0]                m1_oper0_rdata, m1_oper0_wdata;
@@ -145,12 +146,14 @@ module eFPGA_wrapper1
    wire [1:0]                 m1_coef_rmode, m1_coef_wmode;
    wire [31:0]                m1_coef_rdata, m1_coef_wdata;
    wire [11:0]                m1_coef_raddr,m1_coef_waddr;
+   wire                       m1_oper0_powerdn,m1_oper1_powerdn,m1_coef_powerdn;
    
    assign fpga_in = {{(80-`N_FPGAIO){1'b0}},fpgaio_in};
    assign fpgaio_oe = fpga_oe[`N_FPGAIO-1:0];
    assign fpgaio_out = fpga_out[`N_FPGAIO-1:0];
    
-   A2_design top1 (// Arnold2_Design (
+   //A2_design top1 (// Arnold2_Design (
+   top1 Arnold2_Design (
 // ouputs to FCB
 
  // SOC signals
@@ -174,20 +177,20 @@ module eFPGA_wrapper1
 .tcdm_wdata_p2(tcdm_wdata_p2),
 .tcdm_wdata_p1(tcdm_wdata_p1),
 .tcdm_wdata_p0(tcdm_wdata_p0), 
-.tcdm_req_p3(tcdm_req_p3_o),
-.tcdm_we_p3(tcdm_wen_p3_o),
-.tcdm_req_p2(tcdm_req_p2_o),
-.tcdm_we_p2(tcdm_wen_p2_o),
-.tcdm_req_p1(tcdm_req_p1_o),
-.tcdm_we_p1(tcdm_wen_p1_o),
-.tcdm_req_p0(tcdm_req_p0_o),
-.tcdm_we_p0(tcdm_wen_p0_o),
+.tcdm_req_p3(tcdm_req_p3),
+.tcdm_wen_p3(tcdm_wen_p3),
+.tcdm_req_p2(tcdm_req_p2),
+.tcdm_wen_p2(tcdm_wen_p2),
+.tcdm_req_p1(tcdm_req_p1),
+.tcdm_wen_p1(tcdm_wen_p1),
+.tcdm_req_p0(tcdm_req_p0),
+.tcdm_wen_p0(tcdm_wen_p0),
 
 .tcdm_clk_p0(tcdm_clk_p0),
 .tcdm_clk_p1(tcdm_clk_p1),
 .tcdm_clk_p2(tcdm_clk_p2),
 .tcdm_clk_p3(tcdm_clk_p3),
-.lint_CLK(apb_fpga_clk_o),
+.lint_clk(apb_fpga_clk_o),
 
 .tcdm_be_p3(tcdm_be_p3),
 .tcdm_be_p2(tcdm_be_p2),
@@ -202,18 +205,18 @@ module eFPGA_wrapper1
 //.PSEL(apb_fpga_psel_i),
 //.PWRITE(apb_fpga_pwrite_i),
 .RESET({RESET_LB,RESET_LT,RESET_RT,RESET_RB}),
-.tcdm_rdata_p3(tcdm_r_rdata_p3_i),
-.tcdm_rdata_p2(tcdm_r_rdata_p2_i),
-.tcdm_rdata_p1(tcdm_r_rdata_p1_i),
-.tcdm_rdata_p0(tcdm_r_rdata_p0_i),
-.tcdm_gnt_p3(tcdm_gnt_p3_i),
-.tcdm_gnt_p2(tcdm_gnt_p2_i),
-.tcdm_gnt_p1(tcdm_gnt_p1_i),
-.tcdm_gnt_p0(tcdm_gnt_p0_i),
-.tcdm_valid_p3(tcdm_r_valid_p3_i),
-.tcdm_valid_p2(tcdm_r_valid_p2_i),
-.tcdm_valid_p1(tcdm_r_valid_p1_i),
-.tcdm_valid_p0(tcdm_r_valid_p0_i),
+.tcdm_rdata_p3(tcdm_rdata_p3),
+.tcdm_rdata_p2(tcdm_rdata_p2),
+.tcdm_rdata_p1(tcdm_rdata_p1),
+.tcdm_rdata_p0(tcdm_rdata_p0),
+.tcdm_gnt_p3(tcdm_gnt_p3),
+.tcdm_gnt_p2(tcdm_gnt_p2),
+.tcdm_gnt_p1(tcdm_gnt_p1),
+.tcdm_gnt_p0(tcdm_gnt_p0),
+.tcdm_valid_p3(tcdm_valid_p3),
+.tcdm_valid_p2(tcdm_valid_p2),
+.tcdm_valid_p1(tcdm_valid_p1),
+.tcdm_valid_p0(tcdm_valid_p0),
 
                  .m0_m0_clk(m0_m0_clk),
                  .m0_m0_clken(m0_m0_clken),
@@ -256,7 +259,8 @@ module eFPGA_wrapper1
                  .m0_oper0_wdata(m0_oper0_wdata),
                  .m0_oper0_raddr(m0_oper0_raddr),
                  .m0_oper0_waddr(m0_oper0_waddr),
-                 
+.m0_oper0_powerdn(m0_oper0_powerdn),
+                        
                  .m0_oper1_rclk(m0_oper1_rclk),
                  .m0_oper1_wclk(m0_oper1_wclk),
                  .m0_oper1_we(m0_oper1_we),
@@ -267,6 +271,7 @@ module eFPGA_wrapper1
                  .m0_oper1_wdata(m0_oper1_wdata),
                  .m0_oper1_raddr(m0_oper1_raddr),
                  .m0_oper1_waddr(m0_oper1_waddr),
+.m0_oper1_powerdn(m0_oper1_powerdn),
                  
                  .m0_coef_rclk(m0_coef_rclk),
                  .m0_coef_wclk(m0_coef_wclk),
@@ -278,7 +283,8 @@ module eFPGA_wrapper1
                  .m0_coef_wdata(m0_coef_wdata),
                  .m0_coef_raddr(m0_coef_raddr),
                  .m0_coef_waddr(m0_coef_waddr),
-
+.m0_coef_powerdn(m0_coef_powerdn),
+                        
                  .m1_m0_clk(m1_m0_clk),
                  .m1_m0_clken(m1_m0_clken),
                  .m1_m0_tc(m1_m0_tc),
@@ -320,6 +326,7 @@ module eFPGA_wrapper1
                  .m1_oper0_wdata(m1_oper0_wdata),
                  .m1_oper0_raddr(m1_oper0_raddr),
                  .m1_oper0_waddr(m1_oper0_waddr),
+.m1_oper0_powerdn(m1_oper0_powerdn),
                  
                  .m1_oper1_rclk(m1_oper1_rclk),
                  .m1_oper1_wclk(m1_oper1_wclk),
@@ -331,6 +338,7 @@ module eFPGA_wrapper1
                  .m1_oper1_wdata(m1_oper1_wdata),
                  .m1_oper1_raddr(m1_oper1_raddr),
                  .m1_oper1_waddr(m1_oper1_waddr),
+.m1_oper1_powerdn(m1_oper1_powerdn),
                  
                  .m1_coef_rclk(m1_coef_rclk),
                  .m1_coef_wclk(m1_coef_wclk),
@@ -341,8 +349,8 @@ module eFPGA_wrapper1
                  .m1_coef_rdata(m1_coef_rdata),
                  .m1_coef_wdata(m1_coef_wdata),
                  .m1_coef_raddr(m1_coef_raddr),
-                 .m1_coef_waddr(m1_coef_waddr)
-
+                 .m1_coef_waddr(m1_coef_waddr),
+.m1_coef_powerdn(m1_coef_powerdn)
 /*                       
                                  .fb_spe_out   (test_fb_spe_out),
                                  .fcb_bl_dout     (fcb_bl_dout),
@@ -507,7 +515,7 @@ A2_MATH_UNIT M0 (
                  .oper0_wdata(m0_oper0_wdata),
                  .oper0_raddr(m0_oper0_raddr),
                  .oper0_waddr(m0_oper0_waddr),
-                 .oper0_pwrdn(0),
+                 .oper0_pwrdn(m0_oper0_powerdn),
 
                  .oper1_rclk(m0_oper1_rclk),
                  .oper1_wclk(m0_oper1_wclk),
@@ -519,7 +527,7 @@ A2_MATH_UNIT M0 (
                  .oper1_wdata(m0_oper1_wdata),
                  .oper1_raddr(m0_oper1_raddr),
                  .oper1_waddr(m0_oper1_waddr),
-                 .oper1_pwrdn(0),
+                 .oper1_pwrdn(m0_oper1_powerdn),
                  
                  .coef_rclk(m0_coef_rclk),
                  .coef_wclk(m0_coef_wclk),
@@ -531,7 +539,7 @@ A2_MATH_UNIT M0 (
                  .coef_wdata(m0_coef_wdata),
                  .coef_raddr(m0_coef_raddr),
                  .coef_waddr(m0_coef_waddr),
-                 .coef_pwrdn(0)
+                 .coef_pwrdn(m0_coef_powerdn)
                  );
 A2_MATH_UNIT M1 (
                  .m0_clk(m1_m0_clk),
@@ -575,7 +583,7 @@ A2_MATH_UNIT M1 (
                  .oper0_wdata(m1_oper0_wdata),
                  .oper0_raddr(m1_oper0_raddr),
                  .oper0_waddr(m1_oper0_waddr),
-                 .oper0_pwrdn(0),
+                 .oper0_pwrdn(m1_oper0_powerdn),
                  
                  .oper1_rclk(m1_oper1_rclk),
                  .oper1_wclk(m1_oper1_wclk),
@@ -587,7 +595,7 @@ A2_MATH_UNIT M1 (
                  .oper1_wdata(m1_oper1_wdata),
                  .oper1_raddr(m1_oper1_raddr),
                  .oper1_waddr(m1_oper1_waddr),
-                 .oper1_pwrdn(0),
+                 .oper1_pwrdn(m1_oper1_powerdn),
 
                  .coef_rclk(m1_coef_rclk),
                  .coef_wclk(m1_coef_wclk),
@@ -599,7 +607,7 @@ A2_MATH_UNIT M1 (
                  .coef_wdata(m1_coef_wdata),
                  .coef_raddr(m1_coef_raddr),
                  .coef_waddr(m1_coef_waddr),
-                 .coef_pwrdn(0)                 
+                 .coef_pwrdn(m1_coef_powerdn)                 
                  
 
                  );

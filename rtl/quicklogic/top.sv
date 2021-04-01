@@ -84,13 +84,18 @@ module top1
    logic [2:0] 			cnt5,cnt4,cnt3,cnt2,cnt1;
    
    logic                        saved_REQ;
+   logic                        launch_p0, launch_p1, launch_p2, launch_p3;
+   logic [3:0]                  p0_fsm, p1_fsm, p2_fsm, p3_fsm;
+   logic [11:0]                 p0_cnt,p1_cnt,p2_cnt,p3_cnt;
+
+   logic [31:0]                 last_control;
    
    
    parameter IDLE = 0, ENABLE = 1, READ = 2, WRITE = 3;
    parameter READ_WAIT = 4, READ_DONE = 5;
 
    assign version = 8'h55; // defpins for versin register in soc_cntrl
-   assign status_out = ~control_in; // Loop around logic for test
+   assign status_out = control_in; // Loop around logic for test
    
    
      
@@ -302,9 +307,18 @@ module top1
 	 m0_m1_clken <= 0;
 	 m1_m0_clken <= 0;
 	 m1_m1_clken <= 0;
-
+         launch_p0 <= 0;
+         launch_p1 <= 0;
+         launch_p2 <= 0;
+         launch_p3 <= 0;
+         p0_fsm <= '0;
+         p1_fsm <= '0;
+         p2_fsm <= '0;
+         p3_fsm <= '0;
+         last_control <= '0;
       end // if (RESET[0] == 0)
       else begin
+         last_control <= control_in;
          saved_REQ <= lint_REQ;
 	 m0_m0_clken <= 0;
 	 m0_m1_clken <= 0;
@@ -328,6 +342,213 @@ module top1
 	 if (tcdm_valid_p3)
 	   tcdm_result_p3 <= tcdm_rdata_p3;
 	 
+         m0_oper0_we <= 0;
+         m0_oper1_we <= 0;
+         m0_coef_we <= 0;
+         m1_oper0_we <= 0;
+         m1_oper1_we <= 0;
+         m1_coef_we <= 0;
+         launch_p0 <= ~last_control[0] & control_in[0];
+         launch_p1 <= ~last_control[1] & control_in[1];
+         launch_p2 <= ~last_control[2] & control_in[2];
+         launch_p3 <= ~last_control[3] & control_in[3];
+         case (p0_fsm)
+           0: begin
+              p0_cnt <= '0;
+              if (launch_p0 == 1) begin
+                 launch_p0 <= 0;
+                 m0_oper0_raddr <= 0;
+                 m0_oper0_waddr <= 0;
+                 if (tcdm_wen_p0 == 0) // write
+                   p0_fsm <= 1;
+                 else
+                   p0_fsm <= 2;
+              end
+           end
+           1: begin
+              tcdm_wdata_p0 <= m0_oper0_rdata;
+              if (p0_cnt < control_in[23:16]) begin
+                 tcdm_req_p0 <= 1;
+                 if (tcdm_gnt_p0 == 1) begin
+                    m0_oper0_raddr <= p0_cnt << 2;
+                    p0_cnt <= p0_cnt + 1;
+                    tcdm_addr_p0 <= tcdm_addr_p0 + 4;
+                 end
+              end
+              else
+                p0_fsm <= 0;
+           end
+           2: begin
+              m0_oper0_wdata <= tcdm_rdata_p0;
+              if (m0_oper0_we == 1)
+                m0_oper0_waddr <= p0_cnt << 2;
+              tcdm_req_p0 <= 1;
+              if (tcdm_gnt_p0) begin
+                 p0_cnt <= p0_cnt + 1;            
+                 p0_fsm <= 3;
+
+              end
+           end // case: 2
+           3: begin
+              if (tcdm_req_p0 == 1)
+                tcdm_addr_p0 <=  tcdm_addr_p0 +4;
+              tcdm_req_p0 <= 0;
+              if (tcdm_valid_p0 == 1) begin
+                 m0_oper0_we <= 1;
+                if (p0_cnt < control_in[23:16]) 
+                  p0_fsm <= 2;
+                else
+                  p0_fsm <= 0;
+              end
+           end
+         endcase // case (p0_fsm)
+         case (p1_fsm)
+           0: begin
+              p1_cnt <= '0;
+              if (launch_p1 == 1) begin
+                 launch_p1 <= 0;
+                 m0_oper1_raddr <= 0;
+                 m0_oper1_waddr <= 0;
+                 if (tcdm_wen_p1 == 0) // write
+                   p1_fsm <= 1;
+                 else
+                   p1_fsm <= 2;
+              end
+           end
+           1: begin
+              tcdm_wdata_p1 <= m0_oper0_rdata;
+              if (p1_cnt < control_in[23:16]) begin
+                 tcdm_req_p1 <= 1;
+                 if (tcdm_gnt_p1 == 1) begin
+                    m0_oper1_raddr <= p1_cnt << 2;
+                    p1_cnt <= p1_cnt + 1;
+                    tcdm_addr_p1 <= tcdm_addr_p1 + 4;
+                 end
+              end
+              else
+                p1_fsm <= 0;
+           end
+           2: begin
+              m0_oper0_wdata <= tcdm_rdata_p1;
+              if (m0_oper1_we == 1)
+                m0_oper1_waddr <= p1_cnt << 2;
+              tcdm_req_p1 <= 1;
+              if (tcdm_gnt_p1) begin
+                 p1_cnt <= p1_cnt + 1;            
+                 p1_fsm <= 3;
+              end
+           end // case: 2
+           3: begin
+              if (tcdm_req_p1 == 1)
+                tcdm_addr_p1 <=  tcdm_addr_p1 +4;
+              tcdm_req_p1 <= 0;
+              if (tcdm_valid_p1 == 1) begin
+                 m0_oper1_we <= 1;
+                if (p1_cnt < control_in[23:16]) 
+                  p1_fsm <= 2;
+                else
+                  p1_fsm <= 0;
+              end
+           end
+         endcase // case (p1_fsm)
+         case (p2_fsm)
+           0: begin
+              p2_cnt <= '0;
+              if (launch_p2 == 1) begin
+                 launch_p2 <= 0;
+                 m1_oper0_raddr <= 0;
+                 m1_oper0_waddr <= 0;
+                 if (tcdm_wen_p2 == 0) // write
+                   p2_fsm <= 1;
+                 else
+                   p2_fsm <= 2;
+              end
+           end
+           1: begin
+              tcdm_wdata_p2 <= m0_oper0_rdata;
+              if (p2_cnt < control_in[23:16]) begin
+                 tcdm_req_p2 <= 1;
+                 if (tcdm_gnt_p2 == 1) begin
+                    m1_oper0_raddr <= p2_cnt << 2;
+                    p2_cnt <= p2_cnt + 1;
+                    tcdm_addr_p2 <= tcdm_addr_p2 + 4;
+                 end
+              end
+              else
+                p2_fsm <= 0;
+           end
+           2: begin
+              m1_oper0_wdata <= tcdm_rdata_p2;
+              if (m1_oper0_we == 1)
+                m1_oper0_waddr <= p2_cnt << 2;
+              tcdm_req_p2 <= 1;
+              if (tcdm_gnt_p2) begin
+                 p2_cnt <= p2_cnt + 1;            
+                 p2_fsm <= 3;
+              end
+           end // case: 2
+           3: begin
+              if (tcdm_req_p2 == 1)
+                tcdm_addr_p2 <=  tcdm_addr_p2 +4;
+              tcdm_req_p2 <= 0;
+              if (tcdm_valid_p2 == 1) begin
+                 m1_oper0_we <= 1;
+                 if (p2_cnt < control_in[23:16]) 
+                  p2_fsm <= 2;
+                else
+                  p2_fsm <= 0;
+              end
+           end
+         endcase // case (p2_fsm)
+         case (p3_fsm)
+           0: begin
+              p3_cnt <= '0;
+              if (launch_p3 == 1) begin
+                 launch_p3 <= 0;
+                 m1_oper1_raddr <= 0;
+                 m1_oper1_waddr <= 0;
+                 if (tcdm_wen_p3 == 0) // write
+                   p3_fsm <= 1;
+                 else
+                   p3_fsm <= 2;
+              end
+           end
+           1: begin
+              tcdm_wdata_p3 <= m1_oper1_rdata;
+              if (p3_cnt < control_in[23:16]) begin
+                 tcdm_req_p3 <= 1;
+                 if (tcdm_gnt_p3 == 1) begin
+                    m1_oper1_raddr <= p3_cnt << 2;
+                    p3_cnt <= p3_cnt + 1;
+                    tcdm_addr_p3 <= tcdm_addr_p3 + 4;
+                 end
+              end
+              else
+                p3_fsm <= 0;
+           end
+           2: begin
+              m1_oper1_wdata <= tcdm_rdata_p3;
+              if (m1_oper1_we == 1)
+                m1_oper1_waddr <= p3_cnt << 2;
+              tcdm_req_p3 <= 1;
+              if (tcdm_gnt_p3) begin
+                 p3_cnt <= p3_cnt + 1;            
+                 p3_fsm <= 3;
+              end
+           end // case: 2
+           3: begin
+              if (tcdm_req_p3 == 1)
+                tcdm_addr_p3 <=  tcdm_addr_p3 +4;
+              tcdm_req_p3 <= 0;
+              if (tcdm_valid_p3 == 1) begin
+                 m1_oper1_we <= 1;
+                if (p3_cnt < control_in[23:16]) 
+                  p3_fsm <= 2;
+                else
+                  p3_fsm <= 0;
+              end
+           end
+         endcase // case (p3_fsm)
 	 case (apb_fsm)
 	   IDLE: begin
               lint_GNT <= 0;
@@ -365,22 +586,22 @@ module top1
 		20'h0: begin 
 		   tcdm_addr_p0 <= lint_WDATA[19:0];
 		   tcdm_wen_p0 <= lint_WDATA[31];
-		   tcdm_be_p0 <= lint_WDATA[23:20];
+		   tcdm_be_p0 <= ~lint_WDATA[23:20];
 		end
 		20'h4: begin 
 		   tcdm_addr_p1 <= lint_WDATA[19:0];
 		   tcdm_wen_p1 <= lint_WDATA[31];
-		   tcdm_be_p1 <= lint_WDATA[23:20];
+		   tcdm_be_p1 <= ~lint_WDATA[23:20];
 		end
 		20'h8: begin
 		   tcdm_addr_p2 <= lint_WDATA[19:0];
 		   tcdm_wen_p2 <= lint_WDATA[31];
-		   tcdm_be_p2 <= lint_WDATA[23:20];
+		   tcdm_be_p2 <= ~lint_WDATA[23:20];
 		end
 		20'hc: begin 
 		   tcdm_addr_p3 <= lint_WDATA[19:0];
 		   tcdm_wen_p3 <= lint_WDATA[31];
-		   tcdm_be_p3 <= lint_WDATA[23:20];
+		   tcdm_be_p3 <= ~lint_WDATA[23:20];
 		end
 		20'h80: begin
 		   tcdm_wdata_p0 <= lint_WDATA;
@@ -437,7 +658,12 @@ module top1
 		20'h58: ifpga_oe[79:64] <= lint_WDATA[15:0];
 		20'h6c: i_events <= lint_WDATA[15:0];
 
-		
+                20'h200: launch_p0 <= 1;
+                20'h204: launch_p1 <= 1;
+                20'h208: launch_p2 <= 1;
+                20'h20c: launch_p3 <= 1;
+
+                
  		20'b0000_0001_xxxx_xxxx_xxxx:  begin // m0_oper0_ram
 		   m0_oper0_waddr <= lint_ADDR[11:0];
 		   m0_oper0_we <= 1'b1;
@@ -478,10 +704,10 @@ module top1
 	   READ: begin
 	      apb_fsm <= READ_WAIT;
 	      casex (lint_ADDR)
-		20'h04: lint_RDATA <= {tcdm_wen_p0,7'b0,tcdm_be_p0,tcdm_addr_p0};
-		20'h08: lint_RDATA <= {tcdm_wen_p1,7'b0,tcdm_be_p1,tcdm_addr_p1};
-		20'h08: lint_RDATA <= {tcdm_wen_p2,7'b0,tcdm_be_p3,tcdm_addr_p2};
-		20'h0C: lint_RDATA <= {tcdm_wen_p3,7'b0,tcdm_be_p3,tcdm_addr_p3};
+		20'h00: lint_RDATA <= {tcdm_wen_p0,7'b0,~tcdm_be_p0,tcdm_addr_p0};
+		20'h04: lint_RDATA <= {tcdm_wen_p1,7'b0,~tcdm_be_p1,tcdm_addr_p1};
+		20'h08: lint_RDATA <= {tcdm_wen_p2,7'b0,~tcdm_be_p3,tcdm_addr_p2};
+		20'h0C: lint_RDATA <= {tcdm_wen_p3,7'b0,~tcdm_be_p3,tcdm_addr_p3};
 
 		20'h10: lint_RDATA <= m0_m0_control;
 		20'h14: lint_RDATA <= m0_m1_control;
@@ -506,7 +732,6 @@ module top1
 		20'h84: lint_RDATA <= tcdm_result_p1;
 		20'h88: lint_RDATA <= tcdm_result_p2;
 		20'h8C: lint_RDATA <= tcdm_result_p3;
-		
 		
 		20'h100: lint_RDATA <= m0_m0_dataout;
 		20'h104: lint_RDATA <= m0_m1_dataout;
@@ -541,7 +766,6 @@ module top1
 	      endcase // casex (lint_ADDR)
 	   end // case: READ_WAIT
            default: apb_fsm <= IDLE;
-           
 	 endcase // case (apb_fsm)
       end // else: !if(RESET[0] == 0)
    end // always @ (posedge CLK[0] or negedge RESET[0])
