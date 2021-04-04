@@ -360,7 +360,7 @@ module top1
                  m0_oper0_raddr <= 0;
                  m0_oper0_waddr <= 0;
                  if (tcdm_wen_p0 == 0) // write
-                   p0_fsm <= 1;
+                   p0_fsm <= 3;
                  else
                    p0_fsm <= 2;
               end
@@ -370,9 +370,8 @@ module top1
               if (p0_cnt < control_in[23:16]) begin
                  tcdm_req_p0 <= 1;
                  if (tcdm_gnt_p0 == 1) begin
-                    m0_oper0_raddr <= p0_cnt << 2;
+                    p0_fsm <= 3;
                     p0_cnt <= p0_cnt + 1;
-                    tcdm_addr_p0 <= tcdm_addr_p0 + 4;
                  end
               end
               else
@@ -390,17 +389,26 @@ module top1
               end
            end // case: 2
            3: begin
-              if (tcdm_req_p0 == 1)
+              if (tcdm_req_p0 == 1) begin
+                m0_oper0_raddr <= p0_cnt << 2;
                 tcdm_addr_p0 <=  tcdm_addr_p0 +4;
+              end
               tcdm_req_p0 <= 0;
               if (tcdm_valid_p0 == 1) begin
-                 m0_oper0_we <= 1;
-                if (p0_cnt < control_in[23:16]) 
-                  p0_fsm <= 2;
-                else
-                  p0_fsm <= 0;
+                 if (tcdm_wen_p0) begin // read
+                    m0_oper0_we <= 1;
+                    if (p0_cnt < control_in[23:16]) 
+                      p0_fsm <= 2;
+                    else
+                      p0_fsm <= 0;
+                 end
+                 else // write
+                   if (p0_cnt < control_in[23:16]) 
+                     p0_fsm <= 1;
+                   else
+                     p0_fsm <= 0;
               end
-           end
+           end // if (tcdm_valid_p0 == 1)
          endcase // case (p0_fsm)
          case (p1_fsm)
            0: begin
@@ -410,46 +418,55 @@ module top1
                  m0_oper1_raddr <= 0;
                  m0_oper1_waddr <= 0;
                  if (tcdm_wen_p1 == 0) // write
-                   p1_fsm <= 1;
+                   p1_fsm <= 3;
                  else
                    p1_fsm <= 2;
               end
            end
            1: begin
-              tcdm_wdata_p1 <= m0_oper0_rdata;
+              tcdm_wdata_p1 <= m0_oper1_rdata;
               if (p1_cnt < control_in[23:16]) begin
                  tcdm_req_p1 <= 1;
                  if (tcdm_gnt_p1 == 1) begin
-                    m0_oper1_raddr <= p1_cnt << 2;
+                    p1_fsm <= 3;
                     p1_cnt <= p1_cnt + 1;
-                    tcdm_addr_p1 <= tcdm_addr_p1 + 4;
                  end
               end
               else
                 p1_fsm <= 0;
            end
            2: begin
-              m0_oper0_wdata <= tcdm_rdata_p1;
+              m0_oper1_wdata <= tcdm_rdata_p1;
               if (m0_oper1_we == 1)
                 m0_oper1_waddr <= p1_cnt << 2;
               tcdm_req_p1 <= 1;
               if (tcdm_gnt_p1) begin
                  p1_cnt <= p1_cnt + 1;            
                  p1_fsm <= 3;
+
               end
            end // case: 2
            3: begin
-              if (tcdm_req_p1 == 1)
+              if (tcdm_req_p1 == 1) begin
+                m0_oper1_raddr <= p1_cnt << 2;
                 tcdm_addr_p1 <=  tcdm_addr_p1 +4;
+              end
               tcdm_req_p1 <= 0;
               if (tcdm_valid_p1 == 1) begin
-                 m0_oper1_we <= 1;
-                if (p1_cnt < control_in[23:16]) 
-                  p1_fsm <= 2;
-                else
-                  p1_fsm <= 0;
+                 if (tcdm_wen_p1) begin // read
+                    m0_oper1_we <= 1;
+                    if (p1_cnt < control_in[23:16]) 
+                      p1_fsm <= 2;
+                    else
+                      p1_fsm <= 0;
+                 end
+                 else // write
+                   if (p1_cnt < control_in[23:16]) 
+                     p1_fsm <= 1;
+                   else
+                     p1_fsm <= 0;
               end
-           end
+           end // if (tcdm_valid_p1 == 1)
          endcase // case (p1_fsm)
          case (p2_fsm)
            0: begin
@@ -459,19 +476,18 @@ module top1
                  m1_oper0_raddr <= 0;
                  m1_oper0_waddr <= 0;
                  if (tcdm_wen_p2 == 0) // write
-                   p2_fsm <= 1;
+                   p2_fsm <= 3;
                  else
                    p2_fsm <= 2;
               end
            end
            1: begin
-              tcdm_wdata_p2 <= m0_oper0_rdata;
+              tcdm_wdata_p2 <= m1_oper0_rdata;
               if (p2_cnt < control_in[23:16]) begin
                  tcdm_req_p2 <= 1;
                  if (tcdm_gnt_p2 == 1) begin
-                    m1_oper0_raddr <= p2_cnt << 2;
+                    p2_fsm <= 3;
                     p2_cnt <= p2_cnt + 1;
-                    tcdm_addr_p2 <= tcdm_addr_p2 + 4;
                  end
               end
               else
@@ -485,20 +501,30 @@ module top1
               if (tcdm_gnt_p2) begin
                  p2_cnt <= p2_cnt + 1;            
                  p2_fsm <= 3;
+                 
               end
            end // case: 2
            3: begin
-              if (tcdm_req_p2 == 1)
-                tcdm_addr_p2 <=  tcdm_addr_p2 +4;
+              if (tcdm_req_p2 == 1) begin
+                 m1_oper0_raddr <= p2_cnt << 2;
+                 tcdm_addr_p2 <=  tcdm_addr_p2 +4;
+              end
               tcdm_req_p2 <= 0;
               if (tcdm_valid_p2 == 1) begin
-                 m1_oper0_we <= 1;
-                 if (p2_cnt < control_in[23:16]) 
-                  p2_fsm <= 2;
-                else
-                  p2_fsm <= 0;
+                 if (tcdm_wen_p2) begin // read
+                    m1_oper0_we <= 1;
+                    if (p2_cnt < control_in[23:16]) 
+                      p2_fsm <= 2;
+                    else
+                      p2_fsm <= 0;
+                 end
+                 else // write
+                   if (p2_cnt < control_in[23:16]) 
+                     p2_fsm <= 1;
+                   else
+                     p2_fsm <= 0;
               end
-           end
+           end // if (tcdm_valid_p2 == 1)
          endcase // case (p2_fsm)
          case (p3_fsm)
            0: begin
@@ -508,7 +534,7 @@ module top1
                  m1_oper1_raddr <= 0;
                  m1_oper1_waddr <= 0;
                  if (tcdm_wen_p3 == 0) // write
-                   p3_fsm <= 1;
+                   p3_fsm <= 3;
                  else
                    p3_fsm <= 2;
               end
@@ -518,9 +544,8 @@ module top1
               if (p3_cnt < control_in[23:16]) begin
                  tcdm_req_p3 <= 1;
                  if (tcdm_gnt_p3 == 1) begin
-                    m1_oper1_raddr <= p3_cnt << 2;
+                    p3_fsm <= 3;
                     p3_cnt <= p3_cnt + 1;
-                    tcdm_addr_p3 <= tcdm_addr_p3 + 4;
                  end
               end
               else
@@ -534,20 +559,30 @@ module top1
               if (tcdm_gnt_p3) begin
                  p3_cnt <= p3_cnt + 1;            
                  p3_fsm <= 3;
+
               end
            end // case: 2
            3: begin
-              if (tcdm_req_p3 == 1)
+              if (tcdm_req_p3 == 1) begin
+                m1_oper1_raddr <= p3_cnt << 2;
                 tcdm_addr_p3 <=  tcdm_addr_p3 +4;
+              end
               tcdm_req_p3 <= 0;
               if (tcdm_valid_p3 == 1) begin
-                 m1_oper1_we <= 1;
-                if (p3_cnt < control_in[23:16]) 
-                  p3_fsm <= 2;
-                else
-                  p3_fsm <= 0;
-              end
-           end
+                 if (tcdm_wen_p3) begin // read
+                    m1_oper1_we <= 1;
+                    if (p3_cnt < control_in[23:16]) 
+                      p3_fsm <= 2;
+                    else
+                      p3_fsm <= 0;
+                 end
+                 else // write
+                   if (p3_cnt < control_in[23:16]) 
+                     p3_fsm <= 1;
+                   else
+                     p3_fsm <= 0;
+              end // if (tcdm_valid_p3 == 1)
+           end // case: 3
          endcase // case (p3_fsm)
 	 case (apb_fsm)
 	   IDLE: begin
