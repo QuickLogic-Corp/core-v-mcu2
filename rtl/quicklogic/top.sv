@@ -360,11 +360,12 @@ module top1
                  m0_oper0_raddr <= 0;
                  m0_oper0_waddr <= 0;
                  if (tcdm_wen_p0 == 0) // write
-                   p0_fsm <= 3;
+                   p0_fsm <= 4;
                  else
                    p0_fsm <= 2;
               end
-           end
+           end // case: 0
+           4: p0_fsm <= 1;
            1: begin
               tcdm_wdata_p0 <= m0_oper0_rdata;
               if (p0_cnt < control_in[23:16]) begin
@@ -418,11 +419,12 @@ module top1
                  m0_oper1_raddr <= 0;
                  m0_oper1_waddr <= 0;
                  if (tcdm_wen_p1 == 0) // write
-                   p1_fsm <= 3;
+                   p1_fsm <= 4;
                  else
                    p1_fsm <= 2;
               end
            end
+           4: p1_fsm <= 1;
            1: begin
               tcdm_wdata_p1 <= m0_oper1_rdata;
               if (p1_cnt < control_in[23:16]) begin
@@ -476,11 +478,12 @@ module top1
                  m1_oper0_raddr <= 0;
                  m1_oper0_waddr <= 0;
                  if (tcdm_wen_p2 == 0) // write
-                   p2_fsm <= 3;
+                   p2_fsm <= 4;
                  else
                    p2_fsm <= 2;
               end
            end
+           4: p2_fsm <= 1;
            1: begin
               tcdm_wdata_p2 <= m1_oper0_rdata;
               if (p2_cnt < control_in[23:16]) begin
@@ -534,11 +537,12 @@ module top1
                  m1_oper1_raddr <= 0;
                  m1_oper1_waddr <= 0;
                  if (tcdm_wen_p3 == 0) // write
-                   p3_fsm <= 3;
+                   p3_fsm <= 4;
                  else
                    p3_fsm <= 2;
               end
            end
+           4: p3_fsm <= 1;
            1: begin
               tcdm_wdata_p3 <= m1_oper1_rdata;
               if (p3_cnt < control_in[23:16]) begin
