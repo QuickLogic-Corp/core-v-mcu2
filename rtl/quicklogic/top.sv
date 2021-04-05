@@ -1,7 +1,7 @@
 `timescale 1ns / 1ns
 //
 // `include "pulp_soc_defines.sv"
-module top1 
+module top 
   (
    input [5:0] 	       CLK,
    input [3:0] 	       RESET,
