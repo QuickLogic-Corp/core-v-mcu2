@@ -7730,8 +7730,8 @@ input WL_SEL_2_;
 input WL_SEL_3_;
 input WL_SEL_TB_INT;
 
-//	top top1_rtl (
-	top1 top1_vq (
+	top top1_rtl (
+//	top1 top1_vq (
 .lint_GNT(F2A_L_15_8),
 .lint_REQ(A2F_L_12_2),
 .lint_VALID(F2A_L_14_9),

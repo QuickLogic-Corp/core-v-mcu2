@@ -190,7 +190,7 @@ A2_design Arnold2_Design ( // use this to go to A2F/F2A
 .tcdm_clk_p1(tcdm_clk_p1),
 .tcdm_clk_p2(tcdm_clk_p2),
 .tcdm_clk_p3(tcdm_clk_p3),
-.lint_clk(apb_fpga_clk_o),
+.lint_CLK(apb_fpga_clk_o),
 
 .tcdm_be_p3(tcdm_be_p3),
 .tcdm_be_p2(tcdm_be_p2),

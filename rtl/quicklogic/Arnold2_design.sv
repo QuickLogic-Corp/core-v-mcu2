@@ -215,7 +215,7 @@ module A2_design
    output [19:0]       tcdm_addr_p2,
    output [19:0]       tcdm_addr_p3,
 
-   output 	       tcdm_we_p0, tcdm_we_p1, tcdm_we_p2, tcdm_we_p3,
+   output 	       tcdm_wen_p0, tcdm_wen_p1, tcdm_wen_p2, tcdm_wen_p3,
    output 	       tcdm_clk_p0,
    output 	       tcdm_req_p0,
    output [3:0]        tcdm_be_p0,
@@ -239,12 +239,12 @@ module A2_design
 
 QL_eFPGA_ArcticPro2_32X32_GF_22 A2 
   (
-   .A2F_CLK0(CLK0),
-   .A2F_CLK1(CLK1),
-   .A2F_CLK2(CLK2),
-   .A2F_CLK3(CLK3),
-   .A2F_CLK4(CLK4),
-   .A2F_CLK5(CLK5),
+   .A2F_CLK0(CLK[0]),
+   .A2F_CLK1(CLK[1]),
+   .A2F_CLK2(CLK[2]),
+   .A2F_CLK3(CLK[3]),
+   .A2F_CLK4(CLK[4]),
+   .A2F_CLK5(CLK[5]),
    .A2F_B_10_0(m1_m0_dataout[11]),
    .A2F_B_10_1(m1_m0_dataout[10]),
    .A2F_B_10_2(m1_m0_dataout[9]),
@@ -1853,7 +1853,7 @@ QL_eFPGA_ArcticPro2_32X32_GF_22 A2
 .F2A_L_13_7(),
 .F2A_L_13_8(),
 .F2A_L_13_9(),
-.F2A_L_14_0(lint_clk),
+.F2A_L_14_0(lint_CLK),
 .F2A_L_14_1(lint_RDATA[16]),
 .F2A_L_14_10(),
 .F2A_L_14_11(),
