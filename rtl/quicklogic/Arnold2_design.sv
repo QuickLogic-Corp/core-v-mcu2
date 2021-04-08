@@ -22,7 +22,7 @@ module A2_design
    input 	       lint_REQ,
    input 	       lint_WEN,
    input [3:0] 	       lint_BE,
-   input [31:0] control_in,
+   input [31:0]        control_in,
 
    input [31:0]        tcdm_rdata_p0,
    input [31:0]        tcdm_rdata_p1,
@@ -31,12 +31,16 @@ module A2_design
 
    input 	       tcdm_valid_p0,
    input 	       tcdm_gnt_p0,
+   input 	       tcdm_fmo_p0,
    input 	       tcdm_valid_p1,
    input 	       tcdm_gnt_p1,
+   input 	       tcdm_fmo_p1,
    input 	       tcdm_valid_p2,
    input 	       tcdm_gnt_p2,
+   input 	       tcdm_fmo_p2,
    input 	       tcdm_valid_p3,
    input 	       tcdm_gnt_p3,
+         input 	       tcdm_fmo_p3,
 
    input logic 	       MLATCH, POR, STM,
    input logic 	       M_0_, M_1_, M_2_, M_3_, M_4_, M_5_,
@@ -232,8 +236,8 @@ module A2_design
    output 	       tcdm_req_p3,
    output [3:0]        tcdm_be_p3,
    output [15:0]       events_o,
-   output [31:0] status_out,
-   output [7:0] version
+   output [31:0]       status_out,
+   output [7:0]        version
 		       );
 
 
@@ -705,7 +709,7 @@ QL_eFPGA_ArcticPro2_32X32_GF_22 A2
 .A2F_R_11_1(tcdm_rdata_p1[13]),
 .A2F_R_11_2(tcdm_rdata_p1[14]),
 .A2F_R_11_3(tcdm_rdata_p1[15]),
-.A2F_R_11_4(0),
+.A2F_R_11_4(tcdm_fmo_p1),
 .A2F_R_11_5(0),
 .A2F_R_12_0(0),
 .A2F_R_12_1(tcdm_rdata_p1[16]),
@@ -761,7 +765,7 @@ QL_eFPGA_ArcticPro2_32X32_GF_22 A2
 .A2F_R_19_1(tcdm_rdata_p2[13]),
 .A2F_R_19_2(tcdm_rdata_p2[14]),
 .A2F_R_19_3(tcdm_rdata_p2[15]),
-.A2F_R_19_4(0),
+.A2F_R_19_4(tcdm_fmo_p2),
 .A2F_R_19_5(0),
 .A2F_R_1_0(0),
 .A2F_R_1_1(0),
@@ -809,7 +813,7 @@ QL_eFPGA_ArcticPro2_32X32_GF_22 A2
 .A2F_R_25_1(tcdm_rdata_p3[13]),
 .A2F_R_25_2(tcdm_rdata_p3[14]),
 .A2F_R_25_3(tcdm_rdata_p3[15]),
-.A2F_R_25_4(0),
+.A2F_R_25_4(tcdm_fmo_p3),
 .A2F_R_25_5(0),
 .A2F_R_26_0(0),
 .A2F_R_26_1(tcdm_rdata_p3[16]),
@@ -887,7 +891,7 @@ QL_eFPGA_ArcticPro2_32X32_GF_22 A2
 .A2F_R_5_1(tcdm_rdata_p0[13]),
 .A2F_R_5_2(tcdm_rdata_p0[14]),
 .A2F_R_5_3(tcdm_rdata_p0[15]),
-.A2F_R_5_4(0),
+.A2F_R_5_4(tcdm_fmo_p0),
 .A2F_R_5_5(0),
 .A2F_R_6_0(RESET_RT),
 .A2F_R_6_1(tcdm_rdata_p0[16]),
