@@ -152,8 +152,8 @@ module eFPGA_wrapper1
    assign fpgaio_oe = fpga_oe[`N_FPGAIO-1:0];
    assign fpgaio_out = fpga_out[`N_FPGAIO-1:0];
    
-A2_design Arnold2_Design ( // use this to go to A2F/F2A
-//   top Arnold2_Design ( // use this to connect rtl directly
+//A2_design Arnold2_Design ( // use this to go to A2F/F2A
+  top Arnold2_Design ( // use this to connect rtl directly
 // ouputs to FCB
 
  // SOC signals
@@ -190,7 +190,7 @@ A2_design Arnold2_Design ( // use this to go to A2F/F2A
 .tcdm_clk_p1(tcdm_clk_p1),
 .tcdm_clk_p2(tcdm_clk_p2),
 .tcdm_clk_p3(tcdm_clk_p3),
-.lint_CLK(apb_fpga_clk_o),
+.lint_clk(apb_fpga_clk_o),
 
 .tcdm_be_p3(tcdm_be_p3),
 .tcdm_be_p2(tcdm_be_p2),

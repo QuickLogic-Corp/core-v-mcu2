@@ -201,7 +201,7 @@ module A2_design
    output [79:0]       fpgaio_out,
    output [79:0]       fpgaio_oe,
    output [31:0]       lint_RDATA,
-   output 	       lint_CLK,
+   output 	       lint_clk,
    output 	       lint_VALID,
    output 	       lint_GNT,
 
@@ -1853,7 +1853,7 @@ QL_eFPGA_ArcticPro2_32X32_GF_22 A2
 .F2A_L_13_7(),
 .F2A_L_13_8(),
 .F2A_L_13_9(),
-.F2A_L_14_0(lint_CLK),
+.F2A_L_14_0(lint_clk),
 .F2A_L_14_1(lint_RDATA[16]),
 .F2A_L_14_10(),
 .F2A_L_14_11(),
