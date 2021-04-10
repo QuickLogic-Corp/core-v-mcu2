@@ -19,7 +19,7 @@
 #
 
 core-v-mcu-soc:
-  commit: interrupt-timer-io-updates
+  commit: master
   server: git@github.com
   group:  QuickLogic-Corp
 
