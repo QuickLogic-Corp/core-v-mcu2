@@ -96,7 +96,7 @@ module top
    parameter READ_WAIT = 4, READ_DONE = 5;
 
    assign version = 8'h55; // defpins for versin register in soc_cntrl
-   assign status_out = control_in; // Loop around logic for test
+   assign status_out = ~control_in; // Loop around logic for test
    
    
      
@@ -380,7 +380,7 @@ module top
                 p0_fsm <= 0;
            end
            2: begin
-              m0_oper0_wdata <= tcdm_rdata_p0;
+
               if (m0_oper0_we == 1)
                 m0_oper0_waddr <= p0_cnt << 2;
               tcdm_req_p0 <= 1;
@@ -398,6 +398,7 @@ module top
               tcdm_req_p0 <= 0;
               if (tcdm_valid_p0 == 1) begin
                  if (tcdm_wen_p0) begin // read
+                    m0_oper0_wdata <= tcdm_rdata_p0;
                     m0_oper0_we <= 1;
                     if (p0_cnt < control_in[23:16]) 
                       p0_fsm <= 2;
@@ -439,7 +440,7 @@ module top
                 p1_fsm <= 0;
            end
            2: begin
-              m0_oper1_wdata <= tcdm_rdata_p1;
+
               if (m0_oper1_we == 1)
                 m0_oper1_waddr <= p1_cnt << 2;
               tcdm_req_p1 <= 1;
@@ -458,6 +459,7 @@ module top
               if (tcdm_valid_p1 == 1) begin
                  if (tcdm_wen_p1) begin // read
                     m0_oper1_we <= 1;
+                    m0_oper1_wdata <= tcdm_rdata_p1;
                     if (p1_cnt < control_in[23:16]) 
                       p1_fsm <= 2;
                     else
@@ -498,7 +500,7 @@ module top
                 p2_fsm <= 0;
            end
            2: begin
-              m1_oper0_wdata <= tcdm_rdata_p2;
+
               if (m1_oper0_we == 1)
                 m1_oper0_waddr <= p2_cnt << 2;
               tcdm_req_p2 <= 1;
@@ -516,6 +518,7 @@ module top
               tcdm_req_p2 <= 0;
               if (tcdm_valid_p2 == 1) begin
                  if (tcdm_wen_p2) begin // read
+                    m1_oper0_wdata <= tcdm_rdata_p2;
                     m1_oper0_we <= 1;
                     if (p2_cnt < control_in[23:16]) 
                       p2_fsm <= 2;
@@ -531,6 +534,65 @@ module top
            end // if (tcdm_valid_p2 == 1)
          endcase // case (p2_fsm)
          case (p3_fsm)
+           0: begin
+              p3_cnt <= '0;
+              if (launch_p3 == 1) begin
+                 launch_p3 <= 0;
+                 m1_oper1_raddr <= 0;
+                 m1_oper1_waddr <= 0;
+                 if (tcdm_wen_p3 == 0) // write
+                   p3_fsm <= 4;
+                 else
+                   p3_fsm <= 2;
+              end
+           end // case: 0
+           4: p3_fsm <= 1;
+           1: begin
+              tcdm_wdata_p3 <= m1_oper1_rdata;
+              if (p3_cnt < control_in[23:16]) begin
+                 tcdm_req_p3 <= 1;
+                 if (tcdm_gnt_p3 == 1) begin
+                    p3_fsm <= 3;
+                    p3_cnt <= p3_cnt + 1;
+                 end
+              end
+              else
+                p3_fsm <= 0;
+           end
+           2: begin
+              if (m1_oper1_we == 1)
+                m1_oper1_waddr <= p3_cnt << 2;
+              tcdm_req_p3 <= 1;
+              if (tcdm_gnt_p3) begin
+                 p3_cnt <= p3_cnt + 1;            
+                 p3_fsm <= 3;
+
+              end
+           end // case: 2
+           3: begin
+              if (tcdm_req_p3 == 1) begin
+                m1_oper1_raddr <= p3_cnt << 2;
+                tcdm_addr_p3 <=  tcdm_addr_p3 +4;
+              end
+              tcdm_req_p3 <= 0;
+              if (tcdm_valid_p3 == 1) begin
+                 if (tcdm_wen_p3) begin // read
+                    m1_oper1_wdata <= tcdm_rdata_p3;
+                    m1_oper1_we <= 1;
+                    if (p3_cnt < control_in[23:16]) 
+                      p3_fsm <= 2;
+                    else
+                      p3_fsm <= 0;
+                 end
+                 else // write
+                   if (p3_cnt < control_in[23:16]) 
+                     p3_fsm <= 1;
+                   else
+                     p3_fsm <= 0;
+              end
+           end // if (tcdm_valid_p3 == 1)
+         endcase // case (p3_fsm)
+/*         case (p3_fsm)
            0: begin
               p3_cnt <= '0;
               if (launch_p3 == 1) begin
@@ -586,7 +648,8 @@ module top
                    m1_oper1_waddr <= m1_oper1_waddr + 4;
               end
            end // case: 3
-         endcase // case (p3_fsm)
+        endcase // case (p3_fsm)
+*/
 	 case (apb_fsm)
 	   IDLE: begin
               lint_GNT <= 0;
